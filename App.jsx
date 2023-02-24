@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import Task from "./components/Task";
 
@@ -7,6 +7,11 @@ function App() {
     JSON.parse(localStorage.getItem("tasks")) || []
   );
   const [taskValue, setTaskValue] = useState("");
+  const inputRef = useRef();
+
+  useEffect(() => {
+    inputRef.current.focus();
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -32,7 +37,16 @@ function App() {
   function handleEdit(id) {
     setTasks((t) => {
       return t.map((task) => {
-        return task.id === id ? { ...task, readOnly: !task.readOnly } : task;
+        return task.id === id
+          ? {
+              ...task,
+              readOnly: !task.readOnly,
+              date: new Intl.DateTimeFormat("en-US", {
+                dateStyle: "short",
+                timeStyle: "short",
+              }).format(new Date()),
+            }
+          : task;
       });
     });
   }
@@ -56,6 +70,7 @@ function App() {
       <div className="enter">
         {" "}
         <input
+          ref={inputRef}
           type="text"
           name="task"
           placeholder="Add a Task"
